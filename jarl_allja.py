@@ -5,6 +5,9 @@
 import datetime
 import logging
 
+from pytz import timezone
+from dateutil import parser
+
 from pathlib import Path
 
 from PyQt6 import QtWidgets
@@ -341,14 +344,19 @@ def cabrillo(self, file_encoding):
 
                 loggeddate = the_date_and_time[:10]
                 loggedtime = the_date_and_time[11:13] + the_date_and_time[14:16]
+                utc_s = loggeddate + " " + loggedtime + "+0000"
+                jst_s=parser.parse(utc_s).astimezone(timezone('Asia/Tokyo'))
+                loggeddt_jst = jst_s.strftime('%Y-%m-%d %H%M')
+#                allloggedtime = the_date_and_time[1:16]
                 output_cabrillo_line(
-                    f"QSO: {frequency} {themode} {loggeddate} {loggedtime} "
+                    f"QSO: {frequency} {themode} {loggeddt_jst} "
                     f"{contact.get('StationPrefix', '').ljust(13)} "
                     f"{str(contact.get('SNT', '')).ljust(3)} "
                     f"{str(contact.get('SentNr', '')).ljust(6)} "
                     f"{contact.get('Call', '').ljust(13)} "
                     f"{str(contact.get('RCV', '')).ljust(3)} "
-                    f"{str(contact.get('NR', '')).ljust(6)}",
+                    f"{str(contact.get('Exchange1', '')).ljust(6)}",
+                    #f"{str(contact.get('NR', '')).ljust(6)}",
                     "\r\n",
                     file_descriptor,
                     file_encoding,
